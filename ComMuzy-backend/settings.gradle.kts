@@ -1,1 +1,1 @@
-rootProject.name = "ComMuzy-backend"
+rootProject.name = "ComMuzy-Backend"
