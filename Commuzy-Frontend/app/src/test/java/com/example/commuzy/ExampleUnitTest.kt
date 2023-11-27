@@ -1,4 +1,4 @@
-package com.example.commuzy_frontend
+package com.example.commuzy
 
 import org.junit.Test
 

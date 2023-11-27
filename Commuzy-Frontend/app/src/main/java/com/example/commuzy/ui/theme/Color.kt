@@ -1,4 +1,4 @@
-package com.example.commuzy_frontend.ui.theme
+package com.example.commuzy.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

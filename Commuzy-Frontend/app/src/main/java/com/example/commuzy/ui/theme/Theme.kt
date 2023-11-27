@@ -1,4 +1,4 @@
-package com.example.commuzy_frontend.ui.theme
+package com.example.commuzy.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun CommuzyFrontendTheme(
+fun CommuzyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

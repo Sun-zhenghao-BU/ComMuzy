@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace 'com.example.commuzy_frontend'
+    namespace 'com.example.commuzy'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.commuzy_frontend"
-        minSdk 24
+        applicationId "com.example.commuzy"
+        minSdk 23
         targetSdk 33
         versionCode 1
         versionName "1.0"

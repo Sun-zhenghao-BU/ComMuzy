@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Commuzy-Frontend"
+rootProject.name = "Commuzy"
 include ':app'
