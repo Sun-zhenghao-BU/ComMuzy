@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,8 @@ import com.example.commuzy.database.DatabaseDao
 import com.example.commuzy.datamodel.Album
 import com.example.commuzy.network.NetworkApi
 import com.example.commuzy.network.NetworkModule
+import com.example.commuzy.player.PlayerBar
+import com.example.commuzy.player.PlayerViewModel
 
 import com.example.commuzy.ui.theme.CommuzyTheme
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -56,6 +61,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var api: NetworkApi
     @Inject
     lateinit var databaseDao: DatabaseDao
+    private val playerViewModel: PlayerViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +85,17 @@ class MainActivity : AppCompatActivity() {
             navController.popBackStack(it.itemId, inclusive = false)
             true
         }
+        val playerBar = findViewById<ComposeView>(R.id.player_bar)
+        playerBar.apply {
+            setContent {
+                MaterialTheme(colors = darkColors()) {
+                    PlayerBar(
+                        playerViewModel
+                    )
+                }
+            }
+        }
+
 
 //      Test retrofit
         GlobalScope.launch(Dispatchers.IO) {

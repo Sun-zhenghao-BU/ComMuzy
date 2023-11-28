@@ -27,16 +27,28 @@ import coil.compose.AsyncImage
 import com.example.commuzy.R
 import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Song
+import com.example.commuzy.player.PlayerUiState
+import com.example.commuzy.player.PlayerViewModel
 
 @Composable
-fun PlaylistScreen(playlistViewModel: PlaylistViewModel) {
+fun PlaylistScreen(
+    playlistViewModel: PlaylistViewModel,
+    playerViewModel: PlayerViewModel
+) {
     val playlistUiState by playlistViewModel.uiState.collectAsState()
+    val playerUiState by playerViewModel.uiState.collectAsState()
+
 
     PlaylistScreenContent(
         playlistUiState = playlistUiState,
+        playerUiState = playerUiState,
         onTapFavorite = {
             Log.d("PlaylistScreen", "Tap favorite $it")
             playlistViewModel.toggleFavorite(it)
+        },
+        onTapSong = {
+            playerViewModel.load(it, playlistUiState.album)
+            playerViewModel.play()
         }
     )
 }
@@ -44,7 +56,9 @@ fun PlaylistScreen(playlistViewModel: PlaylistViewModel) {
 @Composable
 private fun PlaylistScreenContent(
     playlistUiState: PlaylistUiState,
-    onTapFavorite: (Boolean) -> Unit
+    playerUiState: PlayerUiState,
+    onTapFavorite: (Boolean) -> Unit,
+    onTapSong: (Song) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -56,32 +70,65 @@ private fun PlaylistScreenContent(
             onTapFavorite = onTapFavorite
         )
         PlaylistHeader(album = playlistUiState.album)
-        PlaylistContent(playlist = playlistUiState.playlist)
+
+        PlaylistContent(
+            playlist = playlistUiState.playlist,
+            currentSong = playerUiState.song,
+            onTapSong = onTapSong
+        )
+    }
+}
+
+@Composable
+private fun PlaylistHeader(album: Album) {
+    Column {
+        Text(
+            text = album.name,
+            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold),
+            color = Color.White,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+        Text(
+            text = stringResource(id = R.string.album_info, album.artists, album.year),
+            style = MaterialTheme.typography.body2,
+            color = Color.LightGray,
+        )
     }
 }
 
 @Composable
 private fun PlaylistContent(
-    playlist: List<Song>
+    playlist: List<Song>,
+    currentSong: Song?,
+    onTapSong: (Song) -> Unit
 ) {
     val state = rememberLazyListState()
     LazyColumn(state = state) {
         items(playlist) { song ->
-            Song(song, false )
+            Song(
+                song,
+                currentSong == song,
+                onTapSong
+            )
+
         }
 
         item {
             Spacer(modifier = Modifier.height(40.dp))
         }
     }
-
 }
 
 @Composable
-private fun Song(song: Song, isPlaying: Boolean) {
+private fun Song(
+    song: Song,
+    isPlaying: Boolean,
+    onTapSong: (Song) -> Unit
+) {
     Row(
         modifier = Modifier
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable { onTapSong(song) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1.0f)) {
@@ -92,39 +139,20 @@ private fun Song(song: Song, isPlaying: Boolean) {
                     Color.Green
                 } else {
                     Color.White
-                },
+                }
             )
-
             Text(
                 text = song.lyric,
                 style = MaterialTheme.typography.caption,
-                color = Color.Gray,
+                color = Color.Gray
             )
         }
+
         Text(
-            text = song.length,
             modifier = Modifier.padding(start = 8.dp),
-            style = MaterialTheme.typography.body2,
-            color = Color.LightGray,
-        )
-    }
-}
-
-
-@Composable
-private fun PlaylistHeader(album: Album) {
-    Column {
-        Text(
-            text = album.name,
-            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(top = 16.dp),
-            color = Color.White
-        )
-
-        Text(
-            text = stringResource(id = R.string.album_info, album.artists, album.year),
-            style = MaterialTheme.typography.body2,
-            color = Color.LightGray,
+            text = song.length,
+            style = MaterialTheme.typography.caption,
+            color = Color.LightGray
         )
     }
 }
@@ -133,7 +161,7 @@ private fun PlaylistHeader(album: Album) {
 private fun Cover(
     album: Album,
     isFavorite: Boolean,
-    onTapFavorite: (Boolean) -> Unit
+    onTapFavorite: (Boolean) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -144,8 +172,8 @@ private fun Cover(
             Icon(
                 modifier = Modifier
                     .size(28.dp)
-                    .align(Alignment.TopEnd).
-                    clickable { onTapFavorite(!isFavorite) },
+                    .align(Alignment.TopEnd)
+                    .clickable { onTapFavorite(!isFavorite) },
                 painter = painterResource(
                     id = if (isFavorite) {
                         R.drawable.ic_favorite_24
