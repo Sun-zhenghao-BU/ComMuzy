@@ -18,5 +18,5 @@ interface DatabaseDao {
 
     @Query("select * from Album")
     fun fetchFavoriteAlbums(): Flow<List<Album>>
-
 }
+
