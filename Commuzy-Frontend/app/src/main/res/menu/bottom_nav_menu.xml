@@ -9,4 +9,9 @@
         android:id="@+id/favoriteFragment"
         android:icon="@drawable/ic_favorite_24"
         android:title="@string/menu_favorite" />
+
+    <item
+        android:id="@+id/communityFragment"
+        android:icon="@drawable/ic_community_24"
+        android:title="@string/menu_community" />
 </menu>
