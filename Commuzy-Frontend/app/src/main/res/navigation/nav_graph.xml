@@ -54,7 +54,6 @@
         android:name="com.example.commuzy.ui.community.CommunityFragment"
         android:label="FavoriteFragment">
     </fragment>
-
 </navigation>
 
 

@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
     private val playerViewModel: PlayerViewModel by viewModels()
     private lateinit var auth: FirebaseAuth
     private lateinit var authStateListener:FirebaseAuth.AuthStateListener
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "We are at onCreate()")
