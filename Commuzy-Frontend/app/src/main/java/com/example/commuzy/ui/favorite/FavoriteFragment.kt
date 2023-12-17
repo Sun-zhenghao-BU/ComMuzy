@@ -10,7 +10,6 @@ import androidx.compose.material.darkColors
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.commuzy.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
