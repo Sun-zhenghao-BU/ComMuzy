@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
+    <action
+        android:id="@+id/action_global_signInFragment"
+        app:destination="@id/SignInFragment" />
 
     <fragment
         android:id="@+id/homeFragment"
@@ -29,6 +32,21 @@
         <argument
             android:name="album"
             app:argType="com.example.commuzy.datamodel.Album" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/meFragment"
+        android:name="com.example.commuzy.ui.me.meFragment"
+        android:label="meFragment">
+    </fragment>
+
+    <fragment
+        android:id="@+id/SignInFragment"
+        android:name="com.example.commuzy.ui.Auth.SignInFragment"
+        android:label="meFragment">
+        <action
+            android:id="@+id/action_signinFragment_to_meFragment"
+            app:destination="@id/meFragment" />
     </fragment>
 
 </navigation>

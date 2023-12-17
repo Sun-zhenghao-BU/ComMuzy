@@ -9,4 +9,12 @@
         android:id="@+id/favoriteFragment"
         android:icon="@drawable/ic_favorite_24"
         android:title="@string/menu_favorite" />
+    <item
+        android:id="@+id/SignInFragment"
+        android:icon="@drawable/user"
+        android:title="@string/menu_me" />
+<!--    <item-->
+<!--        android:id="@+id/SignInFragment"-->
+<!--        android:icon="@drawable/ic_favorite_24"-->
+<!--        android:title="@string/me"/>-->
 </menu>

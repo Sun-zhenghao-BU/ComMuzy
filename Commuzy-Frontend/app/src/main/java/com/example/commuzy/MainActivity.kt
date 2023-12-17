@@ -1,11 +1,19 @@
 package com.example.commuzy
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.ImageButton
+import android.widget.PopupMenu
+//import android.widget.Toolbar
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import coil.compose.AsyncImage
 import com.example.commuzy.database.DatabaseDao
@@ -45,12 +54,14 @@ import com.example.commuzy.player.PlayerViewModel
 
 import com.example.commuzy.ui.theme.CommuzyTheme
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.google.firebase.auth.FirebaseAuth
 
 // customized extend AppCompatActivity
 @AndroidEntryPoint
@@ -63,11 +74,23 @@ class MainActivity : AppCompatActivity() {
     lateinit var databaseDao: DatabaseDao
     private val playerViewModel: PlayerViewModel by viewModels()
 
-
+    private lateinit var auth: FirebaseAuth
+    private lateinit var authStateListener:FirebaseAuth.AuthStateListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "We are at onCreate()")
         setContentView(R.layout.activity_main)
+
+        auth = FirebaseAuth.getInstance()
+
+        // toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        val menuMore: ImageButton = toolbar.findViewById(R.id.menu_more)
+        menuMore.setOnClickListener {
+            showPopupMenu(menuMore)
+        }
+        // tail: toobar
 
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
 
@@ -78,6 +101,17 @@ class MainActivity : AppCompatActivity() {
         navController.setGraph(R.navigation.nav_graph)
 
         NavigationUI.setupWithNavController(navView, navController)
+
+        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user == null) {
+                // 用户未登录，跳转到登录界面
+                val intent = Intent(this, SignInActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
+
 
         // https://stackoverflow.com/questions/70703505/navigationui-not-working-correctly-with-bottom-navigation-view-implementation
         navView.setOnItemSelectedListener{
@@ -121,6 +155,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun showPopupMenu(view: View) {
+        val popup = PopupMenu(this, view,0,0,R.style.PopupMenuStyle)
+        popup.menuInflater.inflate(R.menu.nav_bar_top, popup.menu)
+        popup.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_logout -> {
+                    FirebaseAuth.getInstance().signOut()
+                    val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                    val navController = navHostFragment.navController
+                    navController.navigate(R.id.action_global_signInFragment)
+
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        auth.addAuthStateListener(authStateListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        auth.removeAuthStateListener(authStateListener)
+    }
+
+
 }
 
 @Composable

@@ -1,5 +1,6 @@
 package com.example.commuzy.datamodel
 
+
 data class Song(
     val name: String,
     val lyric: String,
