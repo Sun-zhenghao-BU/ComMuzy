@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "354748758257",
+    "project_id": "senti2",
+    "storage_bucket": "senti2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354748758257:android:48fa625e178c0ed3d55150",
+        "android_client_info": {
+          "package_name": "com.example.commuzy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354748758257-4lfc73qn4m4503j13ctrggtnmvuqqrm3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtMiBJaAB2Drs4R7GOqyk8yqBo6JtUJ0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354748758257-4lfc73qn4m4503j13ctrggtnmvuqqrm3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354748758257:android:c712e826cb5a7572d55150",
+        "android_client_info": {
+          "package_name": "com.example.spotify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354748758257-4lfc73qn4m4503j13ctrggtnmvuqqrm3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtMiBJaAB2Drs4R7GOqyk8yqBo6JtUJ0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354748758257-4lfc73qn4m4503j13ctrggtnmvuqqrm3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
