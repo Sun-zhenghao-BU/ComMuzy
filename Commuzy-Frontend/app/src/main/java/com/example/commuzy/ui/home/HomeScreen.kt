@@ -106,7 +106,6 @@ fun AlbumSection(section: Section, onTap: (Album) -> Unit) {
     }
 }
 
-
 @Composable
 private fun AlbumCover(album: Album, onTap: (Album) -> Unit) {
     Column(modifier = Modifier.clickable { onTap(album) }) {

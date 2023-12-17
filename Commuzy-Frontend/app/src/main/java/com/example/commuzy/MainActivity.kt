@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var databaseDao: DatabaseDao
     private val playerViewModel: PlayerViewModel by viewModels()
-
     private lateinit var auth: FirebaseAuth
     private lateinit var authStateListener:FirebaseAuth.AuthStateListener
     override fun onCreate(savedInstanceState: Bundle?) {

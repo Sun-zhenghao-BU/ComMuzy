@@ -4,8 +4,8 @@
     <string name="menu_favorite">Favorite</string>
     <string name="menu_me">me</string>
     <string name="menu_SignIn">Sign In</string>
+    <string name="menu_community">Community</string>
     <string name="screen_loading">Screen is loading...</string>
-    <string name="album_info">%1s • %2s</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_email">email</string>
@@ -66,5 +66,7 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="album_info">%1s • %2s</string>
 </resources>
+
 
