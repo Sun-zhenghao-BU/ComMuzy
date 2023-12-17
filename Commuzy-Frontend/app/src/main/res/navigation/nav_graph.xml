@@ -31,6 +31,13 @@
             app:argType="com.example.commuzy.datamodel.Album" />
     </fragment>
 
+    <fragment
+        android:id="@+id/communityFragment"
+        android:name="com.example.commuzy.ui.community.CommunityFragment"
+        android:label="FavoriteFragment">
+    </fragment>
+
+
 </navigation>
 
 
