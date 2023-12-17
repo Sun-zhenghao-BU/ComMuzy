@@ -17,7 +17,8 @@ class CommunityViewModel @Inject constructor(
     private val repository: CommunityRepository
 ): ViewModel() {
     // state
-    private val _uiState = MutableStateFlow(CommunityUiState(posts = emptyList(), isLoading = true))
+    private val _uiState = MutableStateFlow(CommunityUiState(posts = emptyList(), isLoading = false))
+    val favorites: StateFlow<List<String>> = MutableStateFlow(listOf("Song 1", "Song 2", "Song 3"))
     val uiState: StateFlow<CommunityUiState> = _uiState.asStateFlow()
 
 //    fun createPost(content: String) {
