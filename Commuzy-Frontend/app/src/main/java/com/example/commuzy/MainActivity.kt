@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var databaseDao: DatabaseDao
     private val playerViewModel: PlayerViewModel by viewModels()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "We are at onCreate()")
