@@ -25,6 +25,7 @@ fun PlayerBar(viewModel: PlayerViewModel) {
 
     AnimatedVisibility(isVisible) {
         PlayerBarContent(uiState = uiState,
+            viewModel = viewModel,
             togglePlay = {
                 if (uiState.isPlaying) {
                     viewModel.pause()
@@ -42,6 +43,7 @@ fun PlayerBar(viewModel: PlayerViewModel) {
 @Composable
 private fun PlayerBarContent(
     uiState: PlayerUiState,
+    viewModel: PlayerViewModel,
     togglePlay: () -> Unit,
     seekTo: (Long) -> Unit
 ) {
@@ -83,6 +85,16 @@ private fun PlayerBarContent(
                 )
             }
 
+            Icon(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable {
+                        viewModel.shuffle()
+                    },
+                painter = painterResource(id = R.drawable.baseline_shuffle_24), // Replace with your shuffle icon
+                tint = Color.White,
+                contentDescription = "Shuffle"
+            )
             Icon(
                 modifier = Modifier
                     .size(40.dp)

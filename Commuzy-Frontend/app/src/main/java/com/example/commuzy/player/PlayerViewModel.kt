@@ -9,6 +9,7 @@ import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Song
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.source.ShuffleOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,6 +56,23 @@ class PlayerViewModel @Inject constructor (private val exoPlayer: ExoPlayer) : V
     fun pause() {
         exoPlayer.pause()
     }
+    fun shuffle() {
+        val randomSeed = System.currentTimeMillis()
+        val playlistSize = exoPlayer.mediaItemCount
+        val shuffledIndices = IntArray(playlistSize) { it }.apply {
+            shuffle(Random(randomSeed))
+        }
+
+        exoPlayer.setShuffleOrder(
+            ShuffleOrder.DefaultShuffleOrder(
+                shuffledIndices,
+                randomSeed
+            )
+        )
+
+        exoPlayer.shuffleModeEnabled = true
+    }
+
 
     override fun onCleared() {
         exoPlayer.removeListener(this)
@@ -79,6 +98,8 @@ class PlayerViewModel @Inject constructor (private val exoPlayer: ExoPlayer) : V
         )
         exoPlayer.seekTo(positionMs)
     }
+
+
 }
 
 data class PlayerUiState(
