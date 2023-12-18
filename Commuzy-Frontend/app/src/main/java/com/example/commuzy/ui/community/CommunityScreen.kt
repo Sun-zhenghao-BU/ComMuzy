@@ -42,12 +42,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.commuzy.R
+import com.example.commuzy.datamodel.Post
 import com.example.commuzy.ui.home.LoadingSection
 
 @Composable
 fun CommunityScreen(viewModel: CommunityViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val favorites by viewModel.favorites.collectAsState()
+    val favorites by viewModel.favoriteAlbums.collectAsState()
     CommunityScreenContent(uiState, favorites, viewModel)
 }
 
@@ -121,6 +122,8 @@ fun PostSection(post: Post) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(post.author, style = MaterialTheme.typography.h6)
             Text(post.content, style = MaterialTheme.typography.subtitle1)
+            // Make sure albumName is displayed
+            Text(post.albumName, style = MaterialTheme.typography.subtitle2)
         }
     }
 }
