@@ -24,9 +24,7 @@ import com.example.commuzy.datamodel.Album
 @Composable
 fun FavoriteScreen(viewModel: FavoriteViewModel, onTap: (Album) -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
-
     FavoriteScreenContent(uiState.albums, onTap)
-
 }
 
 

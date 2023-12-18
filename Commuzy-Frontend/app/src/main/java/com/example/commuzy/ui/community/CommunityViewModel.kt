@@ -8,8 +8,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.w3c.dom.Comment
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,20 +19,9 @@ class CommunityViewModel @Inject constructor(
     private val repository: CommunityRepository
 ): ViewModel() {
     // state
-    private val _uiState = MutableStateFlow(CommunityUiState(posts = emptyList(), isLoading = true))
+    private val _uiState = MutableStateFlow(CommunityUiState(posts = emptyList(), isLoading = false))
+    val favorites: StateFlow<List<String>> = MutableStateFlow(listOf("Album 1", "Album 2", "Album 3"))
     val uiState: StateFlow<CommunityUiState> = _uiState.asStateFlow()
-
-//    fun createPost(content: String) {
-//        // 这里调用仓库层的方法来发送帖子
-//        viewModelScope.launch {
-//            val result = repository.createPost(Post(content = content))
-//            // 处理结果，更新帖子列表状态
-//            result.fold(
-//                onSuccess = { _posts.value = _posts.value + it },
-//                onFailure = { /* 处理错误情况 */ }
-//            )
-//        }
-//    }
 
     fun fetchCommunityScreen() {
         viewModelScope.launch {
@@ -40,9 +31,31 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun createPost(content: String) {
+    fun createPost(comment: String, album: String) {
+        // Assuming you have a method to generate a unique ID for each post
+        val newPostId = generateUniqueId()
 
+        // Create a new Post object
+        val newPost = Post(
+            id = newPostId,
+            author = "User", // Replace with the actual user information
+            albumName = album,
+            content = comment,
+            timestamp = System.currentTimeMillis(), // Current timestamp
+            comments = emptyList() // Start with an empty list of comments
+        )
+
+        // Update the posts list within the UI state
+        _uiState.update { currentState ->
+            val updatedPosts = currentState.posts + newPost
+            currentState.copy(posts = updatedPosts)
+        }
     }
+}
+
+// Generate a unique ID for each post (placeholder implementation)
+fun generateUniqueId(): String {
+    return UUID.randomUUID().toString()
 }
 
 data class CommunityUiState(
@@ -53,6 +66,7 @@ data class CommunityUiState(
 data class Post(
     val id: String,
     val author: String,
+    val albumName: String,
     val content: String,
     val timestamp: Long,
     val comments: List<Comment>
