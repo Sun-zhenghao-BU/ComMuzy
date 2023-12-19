@@ -2,6 +2,7 @@ package com.example.commuzy.database
 
 import androidx.room.*
 import com.example.commuzy.datamodel.Album
+import com.example.commuzy.datamodel.Comment
 import com.example.commuzy.datamodel.Post
 import kotlinx.coroutines.flow.Flow
 
@@ -40,5 +41,11 @@ interface DatabaseDao {
 
     @Query("UPDATE Post SET downVotes = downVotes + 1 WHERE id = :postId")
     suspend fun downVotePost(postId: Int)
+
+    @Query("SELECT * FROM comments WHERE postId = :postId")
+    fun getCommentsForPost(postId: Int): Flow<List<Comment>>
+
+    @Insert
+    fun addCommentToPost(comment: Comment)
 }
 

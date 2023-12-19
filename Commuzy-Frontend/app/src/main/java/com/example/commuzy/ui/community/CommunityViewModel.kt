@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.commuzy.datamodel.Album
+import com.example.commuzy.datamodel.Comment
 import com.example.commuzy.datamodel.Post
 import com.example.commuzy.repository.CommunityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +27,9 @@ class CommunityViewModel @Inject constructor(
 
     private val _favoriteAlbums = MutableStateFlow<List<Album>>(emptyList())
     val favoriteAlbums: StateFlow<List<Album>> = _favoriteAlbums.asStateFlow()
+
+//    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
+//    val commentsList: StateFlow<List<Comment>> = _comments.asStateFlow()
 
     init {
         fetchFavoriteAlbums()
@@ -71,8 +76,17 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
-    fun addCommentToPost(postId: Int, commentContent: String) {
+    fun addCommentToPost(postId: Int, content: String) {
+        viewModelScope.launch {
+            val newComment = Comment(postId = postId, content = content, timestamp = System.currentTimeMillis())
+            repository.addCommentToPost(newComment)
+            // Probably need to refresh the list
+            getCommentsForPost(postId)
+        }
+    }
 
+    fun getCommentsForPost(postId: Int): Flow<List<Comment>> {
+        return repository.getCommentsForPost(postId)
     }
 
     private fun fetchFavoriteAlbums() {
