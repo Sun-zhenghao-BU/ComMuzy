@@ -309,7 +309,7 @@ fun PostSection(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp) // 小的间距
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_thumb_up),
@@ -321,7 +321,7 @@ fun PostSection(
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp) // 小的间距
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_thumb_down),

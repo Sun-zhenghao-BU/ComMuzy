@@ -6,24 +6,21 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.commuzy.databinding.ActivitySignInBinding
 
 
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
+import com.example.commuzy.datamodel.UserInfo
 import com.example.commuzy.models.User
 import com.example.commuzy.ui.Auth.SignInFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SignInActivity : UserAuthBaseActivity () {
     private lateinit var binding: ActivitySignInBinding
@@ -125,6 +122,13 @@ class SignInActivity : UserAuthBaseActivity () {
         val username = usernameFromEmail(user.email!!)
 
         // Write new user
+        val newUser = UserInfo(id = user.uid, name = username, email = user.email!!)
+        val appDatabase = (application as MainApplication).database
+
+        CoroutineScope(Dispatchers.IO).launch {
+            appDatabase.databaseDao().insertUser(newUser)
+        }
+
         writeNewUser(user.uid, username, user.email)
 
         // Go to MainActivity
@@ -164,34 +168,3 @@ class SignInActivity : UserAuthBaseActivity () {
         database.child("users").child(userId).setValue(user)
     }
 }
-
-//
-//class SignInActivity : AppCompatActivity() {
-//
-//    private lateinit var appBarConfiguration: AppBarConfiguration
-//    private lateinit var binding: ActivitySignInBinding
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//     binding = ActivitySignInBinding.inflate(layoutInflater)
-//     setContentView(binding.root)
-//
-//        setSupportActionBar(binding.toolbar)
-//
-//        val navController = findNavController(R.id.nav_host_fragment_content_sign_in)
-//        appBarConfiguration = AppBarConfiguration(navController.graph)
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-//
-//        binding.fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
-//    }
-//
-//    override fun onSupportNavigateUp(): Boolean {
-//    val navController = findNavController(R.id.nav_host_fragment_content_sign_in)
-//    return navController.navigateUp(appBarConfiguration)
-//            || super.onSupportNavigateUp()
-//    }
-//}

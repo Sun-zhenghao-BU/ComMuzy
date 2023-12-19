@@ -4,10 +4,17 @@ import androidx.room.*
 import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Comment
 import com.example.commuzy.datamodel.Post
+import com.example.commuzy.datamodel.UserInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DatabaseDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: UserInfo)
+
+    @Query("SELECT * FROM UserInfo WHERE id = :userId")
+    suspend fun getUserById(userId: String): UserInfo?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun favoriteAlbum(album: Album)
