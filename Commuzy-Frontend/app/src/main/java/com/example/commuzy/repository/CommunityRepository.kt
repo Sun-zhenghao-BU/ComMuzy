@@ -2,6 +2,7 @@ package com.example.commuzy.repository
 
 import com.example.commuzy.database.DatabaseDao
 import com.example.commuzy.datamodel.Album
+import com.example.commuzy.datamodel.Comment
 import com.example.commuzy.datamodel.Post
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,8 @@ class CommunityRepository @Inject constructor(
         }
     }
 
+    fun getFavoriteAlbums(): Flow<List<Album>> = databaseDao.fetchFavoriteAlbums()
+
     suspend fun deletePost(post: Post) {
         withContext(Dispatchers.IO) {
             databaseDao.deletePost(post)
@@ -51,5 +54,13 @@ class CommunityRepository @Inject constructor(
         }
     }
 
-    fun getFavoriteAlbums(): Flow<List<Album>> = databaseDao.fetchFavoriteAlbums()
+    suspend fun addCommentToPost(comment: Comment) {
+        withContext(Dispatchers.IO) {
+            databaseDao.addCommentToPost(comment)
+        }
+    }
+
+    fun getCommentsForPost(postId: Int): Flow<List<Comment>> {
+        return databaseDao.getCommentsForPost(postId)
+    }
 }
