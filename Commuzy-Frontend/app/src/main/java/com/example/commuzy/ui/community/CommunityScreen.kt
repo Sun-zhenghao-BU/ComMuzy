@@ -105,7 +105,6 @@ fun CommunityScreen(viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
     }
 }
 
-
 @Composable
 fun CommunityScreenContent(uiState: CommunityUiState,
                            favorites: List<Album>,
