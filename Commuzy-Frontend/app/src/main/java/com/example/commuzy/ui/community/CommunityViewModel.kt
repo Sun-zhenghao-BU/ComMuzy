@@ -28,8 +28,8 @@ class CommunityViewModel @Inject constructor(
     private val _favoriteAlbums = MutableStateFlow<List<Album>>(emptyList())
     val favoriteAlbums: StateFlow<List<Album>> = _favoriteAlbums.asStateFlow()
 
-    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
-    val commentsList: StateFlow<List<Comment>> = _comments.asStateFlow()
+//    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
+//    val commentsList: StateFlow<List<Comment>> = _comments.asStateFlow()
 
     init {
         fetchFavoriteAlbums()

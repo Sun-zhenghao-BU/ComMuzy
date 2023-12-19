@@ -4,16 +4,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,21 +33,26 @@ import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -57,19 +67,56 @@ import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Post
 import com.example.commuzy.ui.home.LoadingSection
 import androidx.compose.ui.res.vectorResource
+import androidx.constraintlayout.widget.ConstraintLayout
+import kotlinx.coroutines.NonDisposableHandle.parent
+import kotlinx.coroutines.launch
 
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CommunityScreen(viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val favorites by viewModel.favoriteAlbums.collectAsState()
-    CommunityScreenContent(uiState, favorites, viewModel, onTap)
+
+    val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
+    var selectedPostForComments by remember { mutableStateOf<Post?>(null) }
+
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
+        sheetContent = {
+            if (selectedPostForComments != null) {
+                CommentSheetContent(
+                    post = selectedPostForComments!!,
+                    viewModel = viewModel
+                )
+            } else {
+                Box(Modifier.fillMaxSize()) // Or any placeholder you want to show
+            }
+        }
+    ) {
+        CommunityScreenContent(
+            uiState = uiState,
+            favorites = favorites,
+            viewModel = viewModel,
+            onTap = onTap,
+            onCommentClick = { post ->
+                selectedPostForComments = post
+                coroutineScope.launch { bottomSheetState.show() }
+            }
+        )
+    }
 }
 
+
 @Composable
-fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
+fun CommunityScreenContent(uiState: CommunityUiState,
+                           favorites: List<Album>,
+                           viewModel: CommunityViewModel,
+                           onTap: (Album) -> Unit,
+                           onCommentClick: (Post) -> Unit)
+{
     var showPostCreator by remember { mutableStateOf(false) }
-    var showComments by remember { mutableStateOf(false) }
-    var selectedPostForComments by remember { mutableStateOf<Post?>(null) }
 
     Column {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
@@ -83,8 +130,7 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, vi
                         viewModel = viewModel,
                         onTap = onTap,
                         onShowComments = { selectedPost ->
-                            selectedPostForComments = selectedPost
-                            showComments = true
+                            onCommentClick(selectedPost)
                         }
                     )
                 }
@@ -103,17 +149,6 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, vi
                 onCancel = {
                     showPostCreator = false
                 }
-            )
-        }
-    }
-
-    selectedPostForComments?.let { selectedPost ->
-        if (showComments) {
-            CommentDialog(
-                showComments = true,
-                onHide = { showComments = false },
-                post = selectedPost,
-                viewModel = viewModel
             )
         }
     }
@@ -350,51 +385,53 @@ private fun AlbumRow(album: Album, onTap: (Album) -> Unit) {
 }
 
 @Composable
-fun CommentDialog(
-    showComments: Boolean,
-    onHide: () -> Unit,
+fun CommentSheetContent(
     post: Post,
     viewModel: CommunityViewModel
 ) {
-    if (showComments) {
-        val comments by viewModel.getCommentsForPost(post.id).collectAsState(initial = emptyList())
+    val comments by viewModel.getCommentsForPost(post.id).collectAsState(initial = emptyList())
+    val newCommentText = remember { mutableStateOf("") }
 
-        Dialog(onDismissRequest = { onHide() }) {
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colors.surface
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f)
+            .padding(16.dp)
+    ) {
+        if (comments.isEmpty()) {
+            Text("Loading comments...", modifier = Modifier.padding(bottom = 8.dp))
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = 8.dp),
+                contentPadding = PaddingValues(bottom = 8.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    LazyColumn {
-                        items(comments) { comment ->
-                            Text(comment.content)
-                        }
-                    }
-
-                    // Add new comment
-                    val newCommentText = remember { mutableStateOf("") }
-                    OutlinedTextField(
-                        value = newCommentText.value,
-                        onValueChange = { newCommentText.value = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Add a comment") }
-                    )
-                    Button(
-                        onClick = {
-                            viewModel.addCommentToPost(post.id, newCommentText.value)
-                            newCommentText.value = ""
-                        },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text("Post")
-                    }
+                items(comments) { comment ->
+                    Text(comment.content, modifier = Modifier.padding(bottom = 4.dp))
                 }
             }
         }
+
+        OutlinedTextField(
+            value = newCommentText.value,
+            onValueChange = { newCommentText.value = it },
+            modifier = Modifier
+                .fillMaxWidth(),
+            label = { Text("Add a comment") },
+            maxLines = 1
+        )
+
+        Button(
+            onClick = {
+                viewModel.addCommentToPost(post.id, newCommentText.value)
+                newCommentText.value = ""
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        ) {
+            Text("Post")
+        }
     }
 }
-
