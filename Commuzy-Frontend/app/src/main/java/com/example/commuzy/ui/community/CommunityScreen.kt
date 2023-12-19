@@ -38,6 +38,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -216,10 +217,10 @@ fun PostSection(
     viewModel: CommunityViewModel,
     onTap: (Album) -> Unit
 ) {
-    val album by produceState<Album?>(initialValue = null) {
-        viewModel.viewModelScope.launch {
-            value = viewModel.findAlbumForPost(post)
-        }
+    var album by remember { mutableStateOf<Album?>(null) }
+
+    LaunchedEffect(post) {
+        album = viewModel.findAlbumForPost(post)
     }
 
     if (album != null) {
@@ -296,7 +297,4 @@ private fun AlbumRow(album: Album, onTap: (Album) -> Unit) {
         }
     }
 }
-
-
-
 
