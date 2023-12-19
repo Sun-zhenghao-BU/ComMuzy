@@ -43,7 +43,6 @@ class SignInActivity : UserAuthBaseActivity () {
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 初始化 Firebase Auth 和 Database
         database = FirebaseDatabase.getInstance().reference
         auth = FirebaseAuth.getInstance()
 
