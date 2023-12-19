@@ -1,18 +1,22 @@
 package com.example.commuzy.ui.community
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,17 +37,25 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewModelScope
+import coil.compose.AsyncImage
 import com.example.commuzy.R
+import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Post
 import com.example.commuzy.ui.home.LoadingSection
+import kotlinx.coroutines.launch
 
 @Composable
 fun CommunityScreen(viewModel: CommunityViewModel) {
@@ -53,7 +65,7 @@ fun CommunityScreen(viewModel: CommunityViewModel) {
 }
 
 @Composable
-fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<String>, viewModel: CommunityViewModel) {
+fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, viewModel: CommunityViewModel) {
     var showPostCreator by remember { mutableStateOf(false) }
 
     Column {
@@ -63,7 +75,7 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<String>, v
                 item { LoadingSection(stringResource(id = R.string.screen_loading)) }
             } else {
                 items(uiState.posts) { post ->
-                    PostSection(post)
+                    PostSection(post, viewModel, onTap = {})
                 }
             }
         }
@@ -73,8 +85,8 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<String>, v
         Dialog(onDismissRequest = { showPostCreator = false }) {
             PostCreationComponent(
                 albums = favorites,
-                onPostCreated = { comment, selectedAlbum, ->
-                    viewModel.createPost(selectedAlbum, comment) // Call ViewModel's createPost function to create post
+                onPostCreated = { comment, selectedAlbumId, selectedAlbumName ->
+                    viewModel.createPost(comment, selectedAlbumId, selectedAlbumName) // Call ViewModel's createPost function to create post
                     showPostCreator = false
                 },
                 onCancel = {
@@ -113,28 +125,12 @@ fun CommunityScreenHeader(onAddPostClicked: () -> Unit) {
 }
 
 @Composable
-fun PostSection(post: Post) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 8.dp)
-    ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(post.author, style = MaterialTheme.typography.h6)
-            Text(post.content, style = MaterialTheme.typography.subtitle1)
-            // Make sure albumName is displayed
-            Text(post.albumName, style = MaterialTheme.typography.subtitle2)
-        }
-    }
-}
-
-@Composable
 fun PostCreationComponent(
-    albums: List<String>,
-    onPostCreated: (String, String) -> Unit,
+    albums: List<Album>,
+    onPostCreated: (String, Int, String) -> Unit,
     onCancel: () -> Unit
 ) {
-    var selectedAlbum by remember { mutableStateOf(albums.firstOrNull() ?: "") }
+    var selectedAlbum by remember { mutableStateOf(albums.firstOrNull() ?: Album.empty()) }
     var comment by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 
@@ -150,7 +146,7 @@ fun PostCreationComponent(
 
         Box {
             OutlinedButton(onClick = { expanded = true }) {
-                Text(selectedAlbum.ifEmpty { "Select a song" })
+                Text(selectedAlbum.name.ifEmpty { "Select a album" })
                 Icon(Icons.Filled.ArrowDropDown, "Drop Down")
             }
 
@@ -164,7 +160,7 @@ fun PostCreationComponent(
                         selectedAlbum = album
                         expanded = false
                     }) {
-                        Text(album)
+                        Text(album.name)
                     }
                 }
             }
@@ -200,7 +196,7 @@ fun PostCreationComponent(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { onPostCreated(selectedAlbum, comment) },
+                onClick = { onPostCreated(comment, selectedAlbum.id, selectedAlbum.name) },
                 enabled = comment.isNotBlank()
             ) {
                 Text("Post")
@@ -212,3 +208,95 @@ fun PostCreationComponent(
         }
     }
 }
+
+
+@Composable
+fun PostSection(
+    post: Post,
+    viewModel: CommunityViewModel,
+    onTap: (Album) -> Unit
+) {
+    val album by produceState<Album?>(initialValue = null) {
+        viewModel.viewModelScope.launch {
+            value = viewModel.findAlbumForPost(post)
+        }
+    }
+
+    if (album != null) {
+        Card(
+            elevation = 4.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp, horizontal = 8.dp)
+                .clickable { onTap(album!!) }
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = post.author,
+                    style = MaterialTheme.typography.h6
+                )
+                Text(
+                    text = post.content,
+                    style = MaterialTheme.typography.subtitle1
+                )
+                // AlbumRow display album info
+                AlbumRow(album = album!!, onTap = onTap)
+
+                // Comment and Delete icon
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        modifier = Modifier.clickable { viewModel.deletePost(post) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AlbumRow(album: Album, onTap: (Album) -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 12.dp)
+            .clickable {
+                onTap(album)
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            model = album.cover,
+            contentDescription = null,
+            modifier = Modifier
+                .width(60.dp)
+                .aspectRatio(1.0f)
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.FillBounds
+        )
+        Column(
+            modifier = Modifier
+                .weight(1.0f)
+                .padding(start = 8.dp)
+        ) {
+            Text(
+                text = album.name,
+                style = MaterialTheme.typography.body2,
+                color = Color.White,
+            )
+
+            Text(
+                text = stringResource(id = R.string.album_info, album.artists, album.year),
+                style = MaterialTheme.typography.caption,
+                color = Color.Gray,
+            )
+        }
+    }
+}
+
+
+
+

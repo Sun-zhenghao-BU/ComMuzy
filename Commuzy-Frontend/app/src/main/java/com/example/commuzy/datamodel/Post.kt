@@ -10,6 +10,7 @@ data class Post(
     val id: Int = 0,
     val author: String,
     val content: String,
+    val albumId: Int,
     val albumName: String,
     val timestamp: Long,
     val comments: List<Comment>
