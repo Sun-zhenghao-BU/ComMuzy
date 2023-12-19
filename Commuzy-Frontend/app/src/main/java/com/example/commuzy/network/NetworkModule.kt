@@ -30,5 +30,3 @@ object NetworkModule {
         return retrofit.create(NetworkApi::class.java)
     }
 }
-
-

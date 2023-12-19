@@ -1,11 +1,13 @@
 package com.example.commuzy
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.PopupMenu
 //import android.widget.Toolbar
@@ -41,6 +43,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
@@ -78,6 +81,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        window.statusBarColor = ContextCompat.getColor(this, R.color.black)
+        // set navigation bar and status bar black
+        with(window) {
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = ContextCompat.getColor(this@MainActivity, R.color.black)
+            navigationBarColor = ContextCompat.getColor(this@MainActivity, R.color.black)
+        }
+
         Log.d(TAG, "We are at onCreate()")
         setContentView(R.layout.activity_main)
         auth = FirebaseAuth.getInstance()

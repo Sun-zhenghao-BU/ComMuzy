@@ -98,8 +98,6 @@ class EditFragment : Fragment() {
             imagePickerLauncher.launch("image/*")
         }
 
-
-
         b_cancel.setOnClickListener {
             findNavController().navigate(R.id.action_EditFragment_to_meFragment)
         }

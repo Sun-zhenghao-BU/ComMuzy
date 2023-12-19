@@ -74,6 +74,7 @@
     <string name="edit_my_file">Edit my file</string>
     <string name="gender">Gender</string>
     <string name="unknown">  Unknown</string>
+    <string name="my_file">My File</string>
 </resources>
 
 

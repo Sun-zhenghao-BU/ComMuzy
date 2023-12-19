@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Button
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import com.example.commuzy.databinding.ActivitySignInBinding
 
 
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.example.commuzy.models.User
 import com.example.commuzy.ui.Auth.SignInFragment
@@ -33,7 +35,11 @@ class SignInActivity : UserAuthBaseActivity () {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        with(window) {
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = ContextCompat.getColor(this@SignInActivity, R.color.black)
+            navigationBarColor = ContextCompat.getColor(this@SignInActivity, R.color.black)
+        }
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
