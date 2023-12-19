@@ -59,6 +59,22 @@ class CommunityViewModel @Inject constructor(
         }
     }
 
+    fun upVotePost(post: Post) {
+        viewModelScope.launch {
+            repository.upVotePost(post.id)
+        }
+    }
+
+    fun downVotePost(post: Post) {
+        viewModelScope.launch {
+            repository.downVotePost(post.id)
+        }
+    }
+
+    fun addCommentToPost(postId: Int, commentContent: String) {
+
+    }
+
     private fun fetchFavoriteAlbums() {
         viewModelScope.launch {
             repository.getFavoriteAlbums().collect { albums ->
