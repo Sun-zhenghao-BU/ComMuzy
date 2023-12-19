@@ -33,6 +33,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -67,6 +68,8 @@ fun CommunityScreen(viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
 @Composable
 fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
     var showPostCreator by remember { mutableStateOf(false) }
+    var showComments by remember { mutableStateOf(false) }
+    var selectedPostForComments by remember { mutableStateOf<Post?>(null) }
 
     Column {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
@@ -75,7 +78,15 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, vi
                 item { LoadingSection(stringResource(id = R.string.screen_loading)) }
             } else {
                 items(uiState.posts) { post ->
-                    PostSection(post, viewModel, onTap = onTap)
+                    PostSection(
+                        post = post,
+                        viewModel = viewModel,
+                        onTap = onTap,
+                        onShowComments = { selectedPost ->
+                            selectedPostForComments = selectedPost
+                            showComments = true
+                        }
+                    )
                 }
             }
         }
@@ -92,6 +103,17 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, vi
                 onCancel = {
                     showPostCreator = false
                 }
+            )
+        }
+    }
+
+    selectedPostForComments?.let { selectedPost ->
+        if (showComments) {
+            CommentDialog(
+                showComments = true,
+                onHide = { showComments = false },
+                post = selectedPost,
+                viewModel = viewModel
             )
         }
     }
@@ -209,12 +231,12 @@ fun PostCreationComponent(
     }
 }
 
-
 @Composable
 fun PostSection(
     post: Post,
     viewModel: CommunityViewModel,
-    onTap: (Album) -> Unit
+    onTap: (Album) -> Unit,
+    onShowComments: (Post) -> Unit
 ) {
     var album by remember { mutableStateOf<Album?>(null) }
 
@@ -250,7 +272,7 @@ fun PostSection(
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_community_24),
                         contentDescription = "Comment",
-                        modifier = Modifier.clickable { /* 展示评论区域 */ }
+                        modifier = Modifier.clickable { onShowComments(post) }
                     )
 
                     Row(
@@ -323,6 +345,55 @@ private fun AlbumRow(album: Album, onTap: (Album) -> Unit) {
                 style = MaterialTheme.typography.caption,
                 color = Color.Gray,
             )
+        }
+    }
+}
+
+@Composable
+fun CommentDialog(
+    showComments: Boolean,
+    onHide: () -> Unit,
+    post: Post,
+    viewModel: CommunityViewModel
+) {
+    if (showComments) {
+        val comments by viewModel.getCommentsForPost(post.id).collectAsState(initial = emptyList())
+
+        Dialog(onDismissRequest = { onHide() }) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colors.surface
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    LazyColumn {
+                        items(comments) { comment ->
+                            Text(comment.content)
+                        }
+                    }
+
+                    // Add new comment
+                    val newCommentText = remember { mutableStateOf("") }
+                    OutlinedTextField(
+                        value = newCommentText.value,
+                        onValueChange = { newCommentText.value = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Add a comment") }
+                    )
+                    Button(
+                        onClick = {
+                            viewModel.addCommentToPost(post.id, newCommentText.value)
+                            newCommentText.value = ""
+                        },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("Post")
+                    }
+                }
+            }
         }
     }
 }
