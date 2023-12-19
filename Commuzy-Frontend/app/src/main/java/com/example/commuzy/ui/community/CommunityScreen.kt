@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,9 +17,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,7 +51,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -67,8 +65,7 @@ import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Post
 import com.example.commuzy.ui.home.LoadingSection
 import androidx.compose.ui.res.vectorResource
-import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.coroutines.NonDisposableHandle.parent
+import com.example.commuzy.datamodel.Comment
 import kotlinx.coroutines.launch
 
 
@@ -391,6 +388,7 @@ fun CommentSheetContent(
 ) {
     val comments by viewModel.getCommentsForPost(post.id).collectAsState(initial = emptyList())
     val newCommentText = remember { mutableStateOf("") }
+    val scrollState = rememberLazyListState()  // 添加记忆滚动状态
 
     Column(
         modifier = Modifier
@@ -399,25 +397,31 @@ fun CommentSheetContent(
             .padding(16.dp)
     ) {
         if (comments.isEmpty()) {
-            Text("Loading comments...", modifier = Modifier.padding(bottom = 8.dp))
+            Text("Say something...", modifier = Modifier.padding(bottom = 8.dp))
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(bottom = 8.dp),
-                contentPadding = PaddingValues(bottom = 8.dp)
-            ) {
-                items(comments) { comment ->
-                    Text(comment.content, modifier = Modifier.padding(bottom = 4.dp))
+            Row(modifier = Modifier.weight(1f)) {
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    contentPadding = PaddingValues(bottom = 8.dp)
+                ) {
+                    items(comments) { comment ->
+                        CommentItem(comment)
+                    }
                 }
+//                VerticalScrollbar(
+//                    modifier = Modifier.fillMaxHeight().padding(end = 4.dp),
+//                    adapter = rememberScrollbarAdapter(scrollState)
+//                )
             }
         }
 
         OutlinedTextField(
             value = newCommentText.value,
             onValueChange = { newCommentText.value = it },
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Add a comment") },
             maxLines = 1
         )
@@ -435,3 +439,17 @@ fun CommentSheetContent(
         }
     }
 }
+
+@Composable
+fun CommentItem(comment: Comment) {
+    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+        Text(text = "Anthony", style = MaterialTheme.typography.subtitle2)
+        Text(text = comment.content)
+//        Text(
+//            text = comment.timestamp,
+//            style = MaterialTheme.typography.caption,
+//            color = Color.Gray
+//        )
+    }
+}
+
