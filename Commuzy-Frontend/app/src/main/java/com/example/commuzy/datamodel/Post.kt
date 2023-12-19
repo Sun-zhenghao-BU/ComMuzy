@@ -13,6 +13,8 @@ data class Post(
     val albumId: Int,
     val albumName: String,
     val timestamp: Long,
+    val upVotes: Int = 0,
+    val downVotes: Int = 0,
     val comments: List<Comment>
 )
 

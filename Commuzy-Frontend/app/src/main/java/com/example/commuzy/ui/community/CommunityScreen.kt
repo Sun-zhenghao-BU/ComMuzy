@@ -38,24 +38,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
 import com.example.commuzy.R
 import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Post
 import com.example.commuzy.ui.home.LoadingSection
-import kotlinx.coroutines.launch
+import androidx.compose.ui.res.vectorResource
 
 @Composable
 fun CommunityScreen(viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
@@ -216,10 +216,10 @@ fun PostSection(
     viewModel: CommunityViewModel,
     onTap: (Album) -> Unit
 ) {
-    val album by produceState<Album?>(initialValue = null) {
-        viewModel.viewModelScope.launch {
-            value = viewModel.findAlbumForPost(post)
-        }
+    var album by remember { mutableStateOf<Album?>(null) }
+
+    LaunchedEffect(post) {
+        album = viewModel.findAlbumForPost(post)
     }
 
     if (album != null) {
@@ -245,8 +245,38 @@ fun PostSection(
                 // Comment and Delete icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_community_24),
+                        contentDescription = "Comment",
+                        modifier = Modifier.clickable { /* 展示评论区域 */ }
+                    )
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp) // 小的间距
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_thumb_up),
+                            contentDescription = "Upvote",
+                            modifier = Modifier.clickable { viewModel.upVotePost(post) }
+                        )
+                        Text("${post.upVotes}")
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp) // 小的间距
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_thumb_down),
+                            contentDescription = "Downvote",
+                            modifier = Modifier.clickable { viewModel.downVotePost(post) }
+                        )
+                        Text("${post.downVotes}")
+                    }
+
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
@@ -296,7 +326,4 @@ private fun AlbumRow(album: Album, onTap: (Album) -> Unit) {
         }
     }
 }
-
-
-
 

@@ -39,5 +39,17 @@ class CommunityRepository @Inject constructor(
         }
     }
 
+    suspend fun upVotePost(postId: Int) {
+        withContext(Dispatchers.IO) {
+            databaseDao.upVotePost(postId)
+        }
+    }
+
+    suspend fun downVotePost(postId: Int) {
+        withContext(Dispatchers.IO) {
+            databaseDao.downVotePost(postId)
+        }
+    }
+
     fun getFavoriteAlbums(): Flow<List<Album>> = databaseDao.fetchFavoriteAlbums()
 }

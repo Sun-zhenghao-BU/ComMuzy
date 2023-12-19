@@ -34,5 +34,11 @@ interface DatabaseDao {
 
     @Query("SELECT * FROM Album WHERE id = :albumId")
     suspend fun getAlbumById(albumId: Int): Album
+
+    @Query("UPDATE Post SET upVotes = upVotes + 1 WHERE id = :postId")
+    suspend fun upVotePost(postId: Int)
+
+    @Query("UPDATE Post SET downVotes = downVotes + 1 WHERE id = :postId")
+    suspend fun downVotePost(postId: Int)
 }
 
