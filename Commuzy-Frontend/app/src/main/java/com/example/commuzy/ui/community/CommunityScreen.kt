@@ -5,9 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,9 +32,12 @@ import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
@@ -38,7 +45,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,16 +65,54 @@ import com.example.commuzy.datamodel.Album
 import com.example.commuzy.datamodel.Post
 import com.example.commuzy.ui.home.LoadingSection
 import androidx.compose.ui.res.vectorResource
+import com.example.commuzy.datamodel.Comment
+import kotlinx.coroutines.launch
 
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CommunityScreen(viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val favorites by viewModel.favoriteAlbums.collectAsState()
-    CommunityScreenContent(uiState, favorites, viewModel, onTap)
+
+    val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
+    var selectedPostForComments by remember { mutableStateOf<Post?>(null) }
+
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
+        sheetContent = {
+            if (selectedPostForComments != null) {
+                CommentSheetContent(
+                    post = selectedPostForComments!!,
+                    viewModel = viewModel
+                )
+            } else {
+                Box(Modifier.fillMaxSize()) // Or any placeholder you want to show
+            }
+        }
+    ) {
+        CommunityScreenContent(
+            uiState = uiState,
+            favorites = favorites,
+            viewModel = viewModel,
+            onTap = onTap,
+            onCommentClick = { post ->
+                selectedPostForComments = post
+                coroutineScope.launch { bottomSheetState.show() }
+            }
+        )
+    }
 }
 
+
 @Composable
-fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
+fun CommunityScreenContent(uiState: CommunityUiState,
+                           favorites: List<Album>,
+                           viewModel: CommunityViewModel,
+                           onTap: (Album) -> Unit,
+                           onCommentClick: (Post) -> Unit)
+{
     var showPostCreator by remember { mutableStateOf(false) }
 
     Column {
@@ -75,7 +122,14 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, vi
                 item { LoadingSection(stringResource(id = R.string.screen_loading)) }
             } else {
                 items(uiState.posts) { post ->
-                    PostSection(post, viewModel, onTap = onTap)
+                    PostSection(
+                        post = post,
+                        viewModel = viewModel,
+                        onTap = onTap,
+                        onShowComments = { selectedPost ->
+                            onCommentClick(selectedPost)
+                        }
+                    )
                 }
             }
         }
@@ -209,12 +263,12 @@ fun PostCreationComponent(
     }
 }
 
-
 @Composable
 fun PostSection(
     post: Post,
     viewModel: CommunityViewModel,
-    onTap: (Album) -> Unit
+    onTap: (Album) -> Unit,
+    onShowComments: (Post) -> Unit
 ) {
     var album by remember { mutableStateOf<Album?>(null) }
 
@@ -250,7 +304,7 @@ fun PostSection(
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_community_24),
                         contentDescription = "Comment",
-                        modifier = Modifier.clickable { /* 展示评论区域 */ }
+                        modifier = Modifier.clickable { onShowComments(post) }
                     )
 
                     Row(
@@ -324,6 +378,78 @@ private fun AlbumRow(album: Album, onTap: (Album) -> Unit) {
                 color = Color.Gray,
             )
         }
+    }
+}
+
+@Composable
+fun CommentSheetContent(
+    post: Post,
+    viewModel: CommunityViewModel
+) {
+    val comments by viewModel.getCommentsForPost(post.id).collectAsState(initial = emptyList())
+    val newCommentText = remember { mutableStateOf("") }
+    val scrollState = rememberLazyListState()  // 添加记忆滚动状态
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f)
+            .padding(16.dp)
+    ) {
+        if (comments.isEmpty()) {
+            Text("Say something...", modifier = Modifier.padding(bottom = 8.dp))
+        } else {
+            Row(modifier = Modifier.weight(1f)) {
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    contentPadding = PaddingValues(bottom = 8.dp)
+                ) {
+                    items(comments) { comment ->
+                        CommentItem(comment)
+                    }
+                }
+//                VerticalScrollbar(
+//                    modifier = Modifier.fillMaxHeight().padding(end = 4.dp),
+//                    adapter = rememberScrollbarAdapter(scrollState)
+//                )
+            }
+        }
+
+        OutlinedTextField(
+            value = newCommentText.value,
+            onValueChange = { newCommentText.value = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Add a comment") },
+            maxLines = 1
+        )
+
+        Button(
+            onClick = {
+                viewModel.addCommentToPost(post.id, newCommentText.value)
+                newCommentText.value = ""
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+        ) {
+            Text("Post")
+        }
+    }
+}
+
+@Composable
+fun CommentItem(comment: Comment) {
+    Column(modifier = Modifier.padding(bottom = 8.dp)) {
+        Text(text = "Anthony", style = MaterialTheme.typography.subtitle2)
+        Text(text = comment.content)
+//        Text(
+//            text = comment.timestamp,
+//            style = MaterialTheme.typography.caption,
+//            color = Color.Gray
+//        )
     }
 }
 
