@@ -34,7 +34,6 @@ class SignInActivity : UserAuthBaseActivity () {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 初始化绑定
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

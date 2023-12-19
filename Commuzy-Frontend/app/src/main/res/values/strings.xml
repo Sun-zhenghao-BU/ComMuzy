@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Spotify</string>
+    <string name="app_name">ComMuzy</string>
     <string name="menu_home">Home</string>
     <string name="menu_favorite">Favorite</string>
     <string name="menu_me">me</string>
@@ -10,7 +10,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Welcome, </string>
 
-    <string name="hint_email">email</string>
+    <string name="hint_email">email address</string>
     <string name="hint_password">password</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>

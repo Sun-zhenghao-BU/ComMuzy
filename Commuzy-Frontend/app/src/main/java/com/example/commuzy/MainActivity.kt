@@ -80,17 +80,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "We are at onCreate()")
         setContentView(R.layout.activity_main)
-
         auth = FirebaseAuth.getInstance()
-
-        // toolbar
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        val menuMore: ImageButton = toolbar.findViewById(R.id.menu_more)
-        menuMore.setOnClickListener {
-            showPopupMenu(menuMore)
-        }
-        // tail: toobar
 
         val navView = findViewById<BottomNavigationView>(R.id.nav_view)
 
@@ -156,24 +146,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showPopupMenu(view: View) {
-        val popup = PopupMenu(this, view,0,0,R.style.PopupMenuStyle)
-        popup.menuInflater.inflate(R.menu.nav_bar_top, popup.menu)
-        popup.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.action_logout -> {
-                    FirebaseAuth.getInstance().signOut()
-                    val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-                    val navController = navHostFragment.navController
-                    navController.navigate(R.id.action_global_signInFragment)
-
-                    true
-                }
-                else -> false
-            }
-        }
-        popup.show()
-    }
 
     override fun onStart() {
         super.onStart()

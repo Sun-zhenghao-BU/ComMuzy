@@ -1,13 +1,19 @@
 package com.example.commuzy.ui.me
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.fragment.NavHostFragment
 import com.example.commuzy.R
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,12 +22,13 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.commuzy.SignInActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-@AndroidEntryPoint
+
 class meFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var name_text: TextView
@@ -48,6 +55,7 @@ class meFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_me, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val user = auth.currentUser
@@ -59,6 +67,14 @@ class meFragment : Fragment() {
         t_bio=view.findViewById<TextView>(R.id.t_bio)
         t_nickname=view.findViewById<TextView>(R.id.t_nickname)
         i_avatar=view.findViewById<ImageView>(R.id.imageViewAvatar)
+
+        // toolbar
+        val menuMore: ImageButton = view.findViewById(R.id.menu_more)
+        menuMore.setOnClickListener {
+            showPopupMenu(menuMore)
+        }
+        // tail: toobar
+
 //        val registrationDate = user?.metadata?.creationTimestamp?.let {
 //            Date(it).toString()
 //        } ?: "Unknown"
@@ -115,11 +131,29 @@ class meFragment : Fragment() {
 
 
                 } else {
-                    gender_t.text = "Gender: edit me!"
+                    gender_t.text = "unKnown"
                 }
             }
         }
     }
+
+    private fun showPopupMenu(view: View) {
+        val popupMenu = PopupMenu(requireContext(), view)
+        popupMenu.menuInflater.inflate(R.menu.nav_bar_top, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_logout -> {
+                    FirebaseAuth.getInstance().signOut()
+                    startActivity(Intent(requireContext(), SignInActivity::class.java))
+                    requireActivity().finish()
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
+    }
+
 
     fun calculateAge(birthday: String): Int {
         val dob = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(birthday)

@@ -1,17 +1,20 @@
 package com.example.commuzy.ui.me
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,8 +60,11 @@ class EditFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val genders = arrayOf("Male", "Female", "Other","Wish Not to Say")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, genders)
+        val genders = listOf("Male", "Female", "Other","Wish Not to Say")
+        val textColor:Int= Color.WHITE
+        val backgroundColor:Int= Color.GRAY
+        val adapter = context?.let { CustomGenderSpinnerAdapter(it, android.R.layout.simple_spinner_item, genders, textColor,backgroundColor) }
+//        val adapter = ArrayAdapter(requireContext(), android.R.layout.custom_spinner_item, genders)
         b_cancel=view.findViewById<Button>(R.id.edit_button_cancel)
         b_submit=view.findViewById<Button>(R.id.buttonSubmit)
         spinnerGender=view.findViewById(R.id.spinnerGender)
@@ -97,8 +103,17 @@ class EditFragment : Fragment() {
         b_cancel.setOnClickListener {
             findNavController().navigate(R.id.action_EditFragment_to_meFragment)
         }
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerGender.adapter = adapter
+
+        spinnerGender.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedView = view as? TextView
+                selectedView?.setTextColor(Color.WHITE)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
 
         b_submit.setOnClickListener {
             val gender = spinnerGender.selectedItem.toString()
@@ -127,8 +142,6 @@ class EditFragment : Fragment() {
                 db.collection("users")
                     .document(it)
                     .set(mapOf("gender" to gender, "birthday" to birthday, "bio" to bio, "nickname" to nickname))
-//                    .set(mapOf("gender" to gender))
-
                     .addOnSuccessListener {
                         findNavController().navigate(R.id.action_EditFragment_to_meFragment)
                 }
