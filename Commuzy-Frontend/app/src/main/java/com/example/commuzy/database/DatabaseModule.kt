@@ -20,7 +20,7 @@ object DatabaseModule {
             appContext,
             AppDatabase::class.java,
             "commuzy_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
