@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "comments",
+    tableName = "Comments",
     foreignKeys = [
         ForeignKey(
             entity = Post::class,
