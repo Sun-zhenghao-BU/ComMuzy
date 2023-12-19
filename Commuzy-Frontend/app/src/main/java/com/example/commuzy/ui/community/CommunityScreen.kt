@@ -58,14 +58,14 @@ import com.example.commuzy.ui.home.LoadingSection
 import kotlinx.coroutines.launch
 
 @Composable
-fun CommunityScreen(viewModel: CommunityViewModel) {
+fun CommunityScreen(viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
     val favorites by viewModel.favoriteAlbums.collectAsState()
-    CommunityScreenContent(uiState, favorites, viewModel)
+    CommunityScreenContent(uiState, favorites, viewModel, onTap)
 }
 
 @Composable
-fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, viewModel: CommunityViewModel) {
+fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, viewModel: CommunityViewModel, onTap: (Album) -> Unit) {
     var showPostCreator by remember { mutableStateOf(false) }
 
     Column {
@@ -75,7 +75,7 @@ fun CommunityScreenContent(uiState: CommunityUiState, favorites: List<Album>, vi
                 item { LoadingSection(stringResource(id = R.string.screen_loading)) }
             } else {
                 items(uiState.posts) { post ->
-                    PostSection(post, viewModel, onTap = {})
+                    PostSection(post, viewModel, onTap = onTap)
                 }
             }
         }
@@ -245,7 +245,7 @@ fun PostSection(
                 // Comment and Delete icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.End
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
