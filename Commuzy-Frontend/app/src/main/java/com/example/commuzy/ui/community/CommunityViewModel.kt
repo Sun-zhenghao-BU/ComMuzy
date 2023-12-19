@@ -3,13 +3,16 @@ package com.example.commuzy.ui.community
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.commuzy.datamodel.Album
+import com.example.commuzy.datamodel.Post
 import com.example.commuzy.repository.CommunityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.w3c.dom.Comment
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,31 +21,72 @@ class CommunityViewModel @Inject constructor(
 ): ViewModel() {
     // state
     private val _uiState = MutableStateFlow(CommunityUiState(posts = emptyList(), isLoading = false))
-    val favorites: StateFlow<List<String>> = MutableStateFlow(listOf("Song 1", "Song 2", "Song 3"))
     val uiState: StateFlow<CommunityUiState> = _uiState.asStateFlow()
 
-//    fun createPost(content: String) {
-//        // 这里调用仓库层的方法来发送帖子
-//        viewModelScope.launch {
-//            val result = repository.createPost(Post(content = content))
-//            // 处理结果，更新帖子列表状态
-//            result.fold(
-//                onSuccess = { _posts.value = _posts.value + it },
-//                onFailure = { /* 处理错误情况 */ }
-//            )
-//        }
-//    }
+    private val _favoriteAlbums = MutableStateFlow<List<Album>>(emptyList())
+    val favoriteAlbums: StateFlow<List<Album>> = _favoriteAlbums.asStateFlow()
+
+    init {
+        fetchFavoriteAlbums()
+        fetchCommunityScreen()
+    }
 
     fun fetchCommunityScreen() {
         viewModelScope.launch {
-//            val sections = repository.getCommunitySections()
-//            _uiState.value = CommunityUiState(posts = sections, isLoading = false)
-            Log.d("CommunityViewModel", _uiState.value.toString())
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            try {
+                repository.getAllPosts().collect { postsList ->
+                    _uiState.value = CommunityUiState(posts = postsList, isLoading = false)
+                }
+            } catch (e: Exception) {
+                Log.e("CommunityViewModel", "Error fetching community screen data", e)
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
         }
     }
 
-    fun createPost(content: String) {
+    fun createPost(comment: String, albumId: Int, albumName: String) {
+        viewModelScope.launch {
+            repository.createPost("Anthony", comment, albumId, albumName)
+            fetchCommunityScreen()
+        }
+    }
 
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            repository.deletePost(post)
+            fetchCommunityScreen()
+        }
+    }
+
+    fun upVotePost(post: Post) {
+        viewModelScope.launch {
+            repository.upVotePost(post.id)
+        }
+    }
+
+    fun downVotePost(post: Post) {
+        viewModelScope.launch {
+            repository.downVotePost(post.id)
+        }
+    }
+
+    fun addCommentToPost(postId: Int, commentContent: String) {
+
+    }
+
+    private fun fetchFavoriteAlbums() {
+        viewModelScope.launch {
+            repository.getFavoriteAlbums().collect { albums ->
+                _favoriteAlbums.value = albums
+            }
+        }
+    }
+
+    suspend fun findAlbumForPost(post: Post): Album {
+        return withContext(Dispatchers.IO) {
+            repository.getAlbumById(post.albumId)
+        }
     }
 }
 
@@ -51,11 +95,4 @@ data class CommunityUiState(
     val isLoading: Boolean
 )
 
-data class Post(
-    val id: String,
-    val author: String,
-    val content: String,
-    val timestamp: Long,
-    val comments: List<Comment>
-)
 
