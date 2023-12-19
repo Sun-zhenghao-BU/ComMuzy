@@ -26,6 +26,15 @@
     </fragment>
 
     <fragment
+        android:id="@+id/communityFragment"
+        android:name="com.example.commuzy.ui.community.CommunityFragment"
+        android:label="FavoriteFragment">
+        <action
+            android:id="@+id/action_communityFragment_to_playlistFragment"
+            app:destination="@id/playlistFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/playlistFragment"
         android:name="com.example.commuzy.ui.playlist.PlaylistFragment"
         android:label="PlaylistFragment">
@@ -66,6 +75,7 @@
             android:id="@+id/action_EditFragment_to_meFragment"
             app:destination="@id/meFragment" />
     </fragment>
+
 </navigation>
 
 

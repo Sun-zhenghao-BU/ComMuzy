@@ -9,6 +9,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,7 +23,11 @@ class CommunityFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 MaterialTheme(colors = darkColors()) {
-                    CommunityScreen(viewModel)
+                    CommunityScreen(viewModel, onTap = {
+                        val direction =
+                            CommunityFragmentDirections.actionCommunityFragmentToPlaylistFragment(it)
+                        findNavController().navigate(direction)
+                    })
                 }
             }
         }
