@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.me.EditFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/buttonUploadAvatar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/avatar_default"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Gender:"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerGender"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Birthday:"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp"/>
+            <EditText
+                android:id="@+id/edit_text_birthday"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:hint="(dd/MM/yyyy)"
+                android:layout_marginBottom="8dp"
+                android:padding="8dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Bio:"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp"/>
+            <EditText
+                android:id="@+id/edit_text_bio"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:hint="Enter Bio"
+                android:layout_marginBottom="8dp"
+                android:padding="8dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Nick name:"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp"/>
+            <EditText
+                android:id="@+id/edit_text_nickname"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:hint="Enter Nickname"
+                android:padding="8dp"
+
+                android:layout_marginBottom="16dp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/buttonSubmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/edit_button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+
+    </LinearLayout>
+</FrameLayout>

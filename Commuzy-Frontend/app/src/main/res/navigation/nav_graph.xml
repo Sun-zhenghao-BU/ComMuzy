@@ -38,21 +38,33 @@
         android:id="@+id/meFragment"
         android:name="com.example.commuzy.ui.me.meFragment"
         android:label="meFragment">
+        <action
+            android:id="@+id/action_meFragment_to_EditFragment"
+            app:destination="@id/EditFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/SignInFragment"
         android:name="com.example.commuzy.ui.Auth.SignInFragment"
-        android:label="meFragment">
+        android:label="SignInFragment">
         <action
             android:id="@+id/action_signinFragment_to_meFragment"
             app:destination="@id/meFragment" />
     </fragment>
 
+<!--    <fragment-->
+<!--        android:id="@+id/communityFragment"-->
+<!--        android:name="com.example.commuzy.ui.community.CommunityFragment"-->
+<!--        android:label="FavoriteFragment">-->
+<!--    </fragment>-->
+
     <fragment
-        android:id="@+id/communityFragment"
-        android:name="com.example.commuzy.ui.community.CommunityFragment"
-        android:label="FavoriteFragment">
+        android:id="@+id/EditFragment"
+        android:name="com.example.commuzy.ui.me.EditFragment"
+        android:label="EditFragment">
+        <action
+            android:id="@+id/action_EditFragment_to_meFragment"
+            app:destination="@id/meFragment" />
     </fragment>
 </navigation>
 
