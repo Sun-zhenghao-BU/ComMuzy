@@ -14,4 +14,10 @@
         android:id="@+id/communityFragment"
         android:icon="@drawable/ic_community_24"
         android:title="@string/menu_community" />
+
+    <item
+        android:id="@+id/SignInFragment"
+        android:icon="@drawable/user"
+        android:title="@string/menu_me" />
+
 </menu>

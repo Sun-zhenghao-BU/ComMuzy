@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.me.meFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@color/black"
+        android:padding="0dp">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@color/black"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/my_file"
+                android:textColor="@color/white"
+
+                android:textSize="35dp">
+
+            </TextView>
+
+            <ImageButton
+                android:id="@+id/menu_more"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:src="@drawable/menu" />
+        </androidx.appcompat.widget.Toolbar>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@color/black"
+            android:padding="20dp">
+
+
+
+            <ImageView
+                android:id="@+id/imageViewAvatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/avatar_default"
+                android:scaleType="centerCrop" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="235dp">
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="1"
+                    android:padding="16dp">
+
+
+                    <TableRow>
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="match_parent" />
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Nickname:   " />
+                        <TextView
+                            android:id="@+id/t_nickname"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Unknown" />
+                    </TableRow>
+
+                    <TableRow>
+                        <View
+                            android:layout_width="5dp"
+                            android:layout_height="match_parent" />
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="join us for:" />
+                        <TextView
+                            android:id="@+id/me_register_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="@string/unknown" />
+                    </TableRow>
+
+                    <TableRow>
+                        <View
+                            android:layout_width="5dp"
+                            android:layout_height="match_parent" />
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Gender:" />
+                        <TextView
+                            android:id="@+id/me_t_gender"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="@string/unknown" />
+                    </TableRow>
+
+                    <TableRow>
+                        <View
+                            android:layout_width="5dp"
+                            android:layout_height="match_parent" />
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Age:" />
+                        <TextView
+                            android:id="@+id/t_age"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Unknown" />
+                    </TableRow>
+
+                    <TableRow>
+                        <View
+                            android:layout_width="5dp"
+                            android:layout_height="match_parent" />
+                        <TextView
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Bio:" />
+                        <TextView
+                            android:id="@+id/t_bio"
+                            android:layout_width="150dp"
+                            android:layout_height="40dp"
+                            android:textSize="20sp"
+                            android:textColor="@color/white"
+                            android:text="Unknown" />
+                    </TableRow>
+                    <TableRow>
+
+                    </TableRow>
+                </TableLayout>
+            </ScrollView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+            <Button
+                android:id="@+id/me_b_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
+                android:text="@string/edit_my_file" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
